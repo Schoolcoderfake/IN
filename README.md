@@ -1,67 +1,48 @@
-# IN Proxy
+# IN Proxy (Ultraviolet Edition)
 
-A web proxy inspired by Interstellar Proxy, with built-in username/password protection and an optional challenge question for enhanced security.
+This proxy uses [Ultraviolet](https://github.com/titaniumnetwork-dev/Ultraviolet) for fast, secure, and compatible web browsing.
+
+## Initial Setup
+
+1. **Clone the repo and initialize submodules:**
+   ```bash
+   git clone https://github.com/Schoolcoderfake/IN.git
+   cd IN
+   git submodule update --init --recursive
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Run the proxy:**
+   ```bash
+   npm start
+   ```
+   You will be prompted for your username and password in the terminal before the server starts.
 
 ## Features
 
-- **Username & Password Login:** Only users with correct credentials can use the proxy.
-- **Challenge Protection:** Optionally enable a math challenge during login for extra security.
-- **Simple Web UI:** Browse proxied sites in an iframe.
+- **Beautiful homepage** with theme selector (light, dark, neon, solarized, etc.)
+- **Settings page:** tab cloak, pop-up blocker, about:blank, browser engine switcher, theme switcher
+- **Browser engine selection:** Chrome, Firefox, Bing, Safari, Brave, Opera, DuckDuckGo (changes User-Agent)
+- **Ultraviolet backend** for high compatibility and security
+- **No data is logged, leaked, or stolen**
+- **Website login support** (works with most major sites)
+- **Fast performance**
 
-## Setup
+## Privacy & Security
 
-### 1. Clone the repository
+- No credentials or session data are logged, stored, or transmitted to third parties.
+- Your browsing activity remains private.
+- Change the session secret in production for added security.
 
-```sh
-git clone https://github.com/Schoolcoderfake/IN.git
-cd IN
-```
+## Advanced
 
-### 2. Install dependencies
-
-```sh
-npm install
-```
-
-### 3. Configure authentication and security
-
-Open `server.js` and set your username, password, and challenge option in the config section:
-
-```js
-const config = {
-  username: "your_username", // REQUIRED: Set your username
-  password: "your_password", // REQUIRED: Set your password
-  challenge: false // Optional: Set to true to require a math challenge during login
-};
-```
-
-- If `challenge` is set to `true`, users will need to answer a simple math question to log in.
-
-### 4. Run the proxy server
-
-```sh
-npm start
-```
-
-### 5. Access the web interface
-
-Open [http://localhost:3000](http://localhost:3000) in your browser. You will be prompted to log in.
-
-## Usage
-
-- Enter the URL you want to proxy after logging in.
-- The proxied page will be loaded in the iframe below the form.
-
-## Security Notes
-
-- **Change the default secret** in `express-session` for production use.
-- Authentication credentials are stored in plain text in `server.js`. Use environment variables or a secure config for production.
-- For real deployment, consider HTTPS, rate limiting, and more advanced security protections.
-
-## Troubleshooting
-
-If you get "Invalid credentials" or "Challenge failed," make sure you entered the correct username, password, and solved the math challenge (if enabled).
+- Ultraviolet is included as a submodule in `/ultraviolet`.
+- See `/ultraviolet/README.md` for engine-specific configuration.
 
 ---
 
-Enjoy safe and secure proxy browsing with IN Proxy!
+Enjoy safe and customizable proxy browsing!

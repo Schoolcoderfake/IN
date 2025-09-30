@@ -1,0 +1,57 @@
+body.theme-light {
+  background: #f8f9fa;
+  color: #222;
+}
+body.theme-dark {
+  background: #181a1b;
+  color: #eee;
+}
+body.theme-neon {
+  background: #111;
+  color: #39ff14;
+}
+body.theme-solarized {
+  background: #fdf6e3;
+  color: #657b83;
+}
+body.theme-matrix {
+  background: #0f0f0f;
+  color: #00ff41;
+}
+body.theme-pastel {
+  background: #ffe4e1;
+  color: #444;
+}
+body.theme-midnight {
+  background: #2c3e50;
+  color: #ecf0f1;
+}
+
+/* Modal styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 10;
+  left: 0; top: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+}
+.modal-content {
+  background: #fff;
+  margin: 10% auto; padding: 24px 32px;
+  border-radius: 10px;
+  max-width: 400px;
+  position: relative;
+}
+.close {
+  position: absolute;
+  right: 12px; top: 12px;
+  font-size: 2em;
+  cursor: pointer;
+}
+
+/* Form and buttons */
+header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+input, select, button { margin: 8px 0; padding: 8px; border-radius: 5px; border: 1px solid #ccc; }
+button { background: #2979ff; color: #fff; border: none; cursor: pointer; transition: background 0.2s; }
+button:hover { background: #1565c0; }
+#settingsBtn { font-size: 1.5em; background: none; color: inherit; border: none; cursor: pointer; }

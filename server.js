@@ -1,90 +1,79 @@
 const express = require('express');
-const session = require('express-session');
-const bodyParser = require('body-parser');
-const { createProxyMiddleware } = require('http-proxy-middleware');
 const path = require('path');
+const readline = require('readline');
+const { exec } = require('child_process');
 
-const config = {
-  username: "", // <-- Set your username here
-  password: "", // <-- Set your password here
-  challenge: false // Set to true to enable challenge question at login
-};
-
-function generateChallenge() {
-  // Simple math challenge
-  const a = Math.floor(Math.random() * 10) + 1;
-  const b = Math.floor(Math.random() * 10) + 1;
-  return {
-    question: `What is ${a} + ${b}?`,
-    answer: (a + b).toString()
-  };
-}
-
-const app = express();
+const UV_PATH = path.join(__dirname, 'ultraviolet');
 const PORT = process.env.PORT || 3000;
 
-app.use(session({
-  secret: 'in-proxy-secret',
-  resave: false,
-  saveUninitialized: true
-}));
-app.use(bodyParser.urlencoded({ extended: false }));
+// Supported browser engines and their user agents
+const USER_AGENTS = {
+  chrome: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36',
+  firefox: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:117.0) Gecko/20100101 Firefox/117.0',
+  bing: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) BingPreview/1.0b',
+  safari: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.1 Safari/605.1.15',
+  brave: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36 Brave/117.0.0.0',
+  opera: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Opera/104.0.0.0',
+  duckduckgo: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) DuckDuckBot/1.0; (+http://duckduckgo.com/duckduckbot.html)'
+};
 
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.get('/login', (req, res) => {
-  let challengeHtml = '';
-  if (config.challenge) {
-    // Generate and store challenge in session
-    const challenge = generateChallenge();
-    req.session.challenge = challenge;
-    challengeHtml = `
-      <label>${challenge.question}</label>
-      <input type="text" name="challenge" required />
-      <br/><br/>
-    `;
-  }
-  res.send(`
-    <form method="POST" action="/login">
-      <label>Username:</label>
-      <input type="text" name="username" required /><br/><br/>
-      <label>Password:</label>
-      <input type="password" name="password" required /><br/><br/>
-      ${challengeHtml}
-      <button type="submit">Login</button>
-    </form>
-  `);
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
 });
 
-app.post('/login', (req, res) => {
-  const { username, password, challenge } = req.body;
-  if (username === config.username && password === config.password) {
-    if (config.challenge) {
-      if (!req.session.challenge || challenge !== req.session.challenge.answer) {
-        return res.send('Challenge failed. <a href="/login">Try again</a>');
-      }
+function promptLogin() {
+  return new Promise((resolve) => {
+    rl.question('Username: ', (username) => {
+      rl.question('Password: ', (password) => {
+        resolve({ username, password });
+      });
+    });
+  });
+}
+
+(async () => {
+  const { username, password } = await promptLogin();
+  rl.close();
+
+  // TODO: You may want to store and verify credentials securely for production.
+  if (!username || !password) {
+    console.error('Username and password required.');
+    process.exit(1);
+  }
+
+  // Start Ultraviolet backend (see Ultraviolet README for custom launch)
+  exec('npm install', { cwd: UV_PATH }, (err) => {
+    if (err) {
+      console.error('Failed to install Ultraviolet dependencies.');
+      process.exit(1);
     }
-    req.session.authenticated = true;
-    return res.redirect('/');
-  }
-  res.send('Invalid credentials. <a href="/login">Try again</a>');
-});
 
-// Auth middleware
-app.use((req, res, next) => {
-  if (req.session.authenticated || req.path === '/login') {
-    return next();
-  }
-  res.redirect('/login');
-});
+    // You can start Ultraviolet's backend as required, or use its middleware directly.
+    // For now, we assume Ultraviolet exposes a middleware function.
+    const uv = require(path.join(UV_PATH, 'index.js')); // Adjust if main file is different
 
-app.use('/proxy', createProxyMiddleware({
-  target: '', // Will be set dynamically
-  changeOrigin: true,
-  router: req => req.query.url || '',
-  pathRewrite: { '^/proxy': '' }
-}));
+    const app = express();
 
-app.listen(PORT, () => {
-  console.log(`Proxy server running at http://localhost:${PORT}`);
-});
+    app.use(express.static(path.join(__dirname, 'public')));
+
+    // Theme, browser selection, and other settings from client
+    app.use((req, res, next) => {
+      // Block pop-ups (headers)
+      res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; frame-src 'self';");
+      next();
+    });
+
+    // Proxy route for Ultraviolet
+    app.use('/proxy', (req, res, next) => {
+      // Get browser engine from query param or default to chrome
+      const engine = (req.query.engine || 'chrome').toLowerCase();
+      req.headers['user-agent'] = USER_AGENTS[engine] || USER_AGENTS['chrome'];
+      uv(req, res, next);
+    });
+
+    app.listen(PORT, () => {
+      console.log(`IN Proxy running at http://localhost:${PORT}`);
+    });
+  });
+})();

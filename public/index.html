@@ -2,26 +2,68 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>IN Proxy</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 40px; }
-    input { width: 400px; padding: 8px; }
-    button { padding: 8px 16px; }
-  </style>
+  <title id="tab-title">IN Proxy</title>
+  <link rel="stylesheet" href="themes.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
 </head>
-<body>
-  <h1>IN Proxy</h1>
-  <form id="proxyForm">
-    <input type="text" id="urlInput" placeholder="Enter URL to proxy" required />
-    <button type="submit">Go</button>
-  </form>
-  <iframe id="proxyFrame" width="800" height="600" style="margin-top:20px;"></iframe>
-  <script>
-    document.getElementById('proxyForm').onsubmit = function(e) {
-      e.preventDefault();
-      const url = document.getElementById('urlInput').value;
-      document.getElementById('proxyFrame').src = '/proxy?url=' + encodeURIComponent(url);
-    }
-  </script>
+<body class="theme-light">
+  <header>
+    <h1>IN Proxy</h1>
+    <button id="settingsBtn" title="Settings">⚙️</button>
+  </header>
+  <main>
+    <form id="proxyForm">
+      <input type="text" id="urlInput" placeholder="Enter URL to proxy" required />
+      <select id="engineSelect" title="Choose browser engine">
+        <option value="chrome">Chrome</option>
+        <option value="firefox">Firefox</option>
+        <option value="bing">Bing</option>
+        <option value="safari">Safari</option>
+        <option value="brave">Brave</option>
+        <option value="opera">Opera</option>
+        <option value="duckduckgo">DuckDuckGo</option>
+      </select>
+      <button type="submit">Go</button>
+    </form>
+    <div id="actions">
+      <button id="aboutBlankBtn">Open in about:blank</button>
+    </div>
+    <iframe id="proxyFrame" width="100%" height="600" style="margin-top:20px;border-radius:10px;box-shadow:0 0 16px #0001;"></iframe>
+  </main>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeSettings">&times;</span>
+      <h2>Settings</h2>
+      <div>
+        <label>Tab Cloak Title:</label>
+        <input type="text" id="cloakTitle" placeholder="e.g. Google Drive" />
+      </div>
+      <div>
+        <label>Tab Cloak Favicon:</label>
+        <input type="text" id="cloakFavicon" placeholder="Image URL" />
+      </div>
+      <div>
+        <label>Pop-up Blocker:</label>
+        <input type="checkbox" id="popupBlocker" checked />
+      </div>
+      <div>
+        <label>Theme:</label>
+        <select id="themeSelect">
+          <option value="theme-light">Light</option>
+          <option value="theme-dark">Dark</option>
+          <option value="theme-neon">Neon</option>
+          <option value="theme-solarized">Solarized</option>
+          <option value="theme-matrix">Matrix</option>
+          <option value="theme-pastel">Pastel</option>
+          <option value="theme-midnight">Midnight</option>
+        </select>
+      </div>
+      <button id="saveSettings">Save</button>
+    </div>
+  </div>
+
+  <script src="settings.js"></script>
 </body>
 </html>
