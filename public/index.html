@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>IN Proxy</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 40px; }
+    input { width: 400px; padding: 8px; }
+    button { padding: 8px 16px; }
+  </style>
+</head>
+<body>
+  <h1>IN Proxy</h1>
+  <form id="proxyForm">
+    <input type="text" id="urlInput" placeholder="Enter URL to proxy" required />
+    <button type="submit">Go</button>
+  </form>
+  <iframe id="proxyFrame" width="800" height="600" style="margin-top:20px;"></iframe>
+  <script>
+    document.getElementById('proxyForm').onsubmit = function(e) {
+      e.preventDefault();
+      const url = document.getElementById('urlInput').value;
+      document.getElementById('proxyFrame').src = '/proxy?url=' + encodeURIComponent(url);
+    }
+  </script>
+</body>
+</html>
